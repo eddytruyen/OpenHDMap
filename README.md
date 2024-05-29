@@ -303,3 +303,128 @@ spec:
 
 This approach ensures that the OpenHDMap system can efficiently manage HD map production and sharing in a distributed and collaborative manner across multiple MEC hosts using Kubernetes and 5G.
 
+# Pytm Threat model
+### Introduction to PyTM
+
+PyTM is a threat modeling tool that helps security professionals and developers create Data Flow Diagrams (DFD) and identify potential security threats using the STRIDE methodology. PyTM allows users to define elements like processes, data stores, data flows, and boundaries programmatically, and then automatically generates a DFD and associated threat analysis.
+
+### Key Concepts
+
+- **Data Flow Diagram (DFD)**: A graphical representation of data flows through a system, showing processes, data stores, data flows, and external entities.
+- **STRIDE**: A threat modeling framework that identifies six categories of threats:
+  - **Spoofing**: Impersonating something or someone else.
+  - **Tampering**: Modifying data or code.
+  - **Repudiation**: Denying an action.
+  - **Information Disclosure**: Exposing information to unauthorized entities.
+  - **Denial of Service (DoS)**: Making a system unavailable.
+  - **Elevation of Privilege**: Gaining unauthorized access to resources.
+
+### PyTM Example for OpenHDMap Deployment
+
+Below is an example PyTM script for the described OpenHDMap deployment on MEC with Kubernetes, including generating the DFD and identifying STRIDE threats.
+
+```python
+from pytm import TM, Server, Process, Dataflow, Boundary, Data, Actor, Store
+
+# Define the Threat Model
+tm = TM("OpenHDMap Deployment on MEC")
+
+# Define boundaries
+Internet = Boundary("Internet")
+KubernetesCluster = Boundary("Kubernetes Cluster")
+MEC = Boundary("MEC")
+VehicleNetwork = Boundary("Vehicle Network")
+
+# Define elements
+car = Actor("Car")
+vehicle_sensors = Process("Vehicle Sensors")
+lidar_data = Data("Lidar Data")
+gps_data = Data("GPS Data")
+camera_data = Data("Camera Data")
+imu_data = Data("IMU Data")
+
+mec_host = Server("MEC Host")
+k8s_master = Server("K8s Master Node")
+k8s_worker = Server("K8s Worker Node")
+
+data_collection_service = Process("Data Collection Service")
+map_production_service = Process("Map Production Service")
+map_labeling_service = Process("Map Labeling Service")
+map_saving_service = Process("Map Saving Service")
+point_cloud_data = Data("Point Cloud Data")
+hd_map = Store("HD Map")
+
+inter_mec_comm = Dataflow("Inter-MEC Communication", mec_host, mec_host, data="Point Cloud Data")
+
+# Define data flows
+df1 = Dataflow("Sensor Data to MEC", car, vehicle_sensors, data=[lidar_data, gps_data, camera_data, imu_data])
+df2 = Dataflow("Sensor Data to Collection Service", vehicle_sensors, data_collection_service)
+df3 = Dataflow("Collected Data to Production Service", data_collection_service, map_production_service, data=point_cloud_data)
+df4 = Dataflow("Processed Data to Labeling Service", map_production_service, map_labeling_service)
+df5 = Dataflow("Labeled Data to Saving Service", map_labeling_service, map_saving_service)
+df6 = Dataflow("HD Map Storage", map_saving_service, hd_map)
+
+# Define trust boundaries
+df1.boundary = VehicleNetwork
+df2.boundary = MEC
+df3.boundary = KubernetesCluster
+df4.boundary = KubernetesCluster
+df5.boundary = KubernetesCluster
+df6.boundary = KubernetesCluster
+inter_mec_comm.boundary = Internet
+
+# Set threat model properties
+tm.process()
+
+# Print the DFD diagram
+tm.dataflows()
+
+# Generate STRIDE threats
+tm.threats()
+```
+
+### Explanation of Elements
+
+- **Boundaries**: Define different zones such as Internet, Kubernetes Cluster, MEC, and Vehicle Network.
+- **Actors and Processes**: Represent different components such as the car, sensors, MEC host, Kubernetes master and worker nodes, and various services.
+- **Data Flows**: Show the movement of data between components, such as sensor data from cars to the MEC, processing and labeling services, and HD map storage.
+- **Trust Boundaries**: Indicate where data flows cross security boundaries, which is critical for identifying potential threats.
+
+### STRIDE Threat Analysis
+
+Using the above PyTM script, here are the potential STRIDE threats identified:
+
+1. **Spoofing**
+   - Impersonation of vehicles or sensors to inject false data into the system.
+
+2. **Tampering**
+   - Modification of sensor data in transit (e.g., lidar, GPS).
+   - Unauthorized alteration of point cloud data during inter-MEC communication.
+
+3. **Repudiation**
+   - Denying the submission of incorrect or malicious data by a vehicle.
+
+4. **Information Disclosure**
+   - Leakage of sensitive data such as vehicle location and sensor data during transmission.
+   - Unauthorized access to HD maps stored in the Kubernetes cluster.
+
+5. **Denial of Service (DoS)**
+   - Overloading the data collection service to disrupt map production.
+   - Attacks on Kubernetes infrastructure to render MEC hosts unresponsive.
+
+6. **Elevation of Privilege**
+   - Gaining elevated permissions within the Kubernetes cluster to alter map data or disrupt services.
+
+### Mitigation Strategies
+
+To address these threats, consider implementing the following mitigations:
+
+- **Authentication and Authorization**: Ensure strong authentication mechanisms for vehicles and sensors. Use role-based access control (RBAC) within Kubernetes.
+- **Data Encryption**: Encrypt data in transit and at rest to protect against tampering and information disclosure.
+- **Integrity Checks**: Use checksums or digital signatures to verify the integrity of data flows.
+- **Monitoring and Logging**: Implement comprehensive monitoring and logging to detect and respond to suspicious activities.
+- **Rate Limiting and Load Balancing**: Apply rate limiting to prevent DoS attacks and use load balancers to distribute the load effectively.
+- **Secure Inter-MEC Communication**: Use secure channels (e.g., TLS) for data exchange between MEC hosts.
+
+This approach using PyTM and STRIDE helps create a robust security framework for deploying the OpenHDMap system on MEC with Kubernetes, ensuring data integrity, confidentiality, and availability.
+
