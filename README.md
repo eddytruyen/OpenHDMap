@@ -167,3 +167,139 @@ Benchmark of the process:
 [paperjs](http://paperjs.org/examples/hit-testing/)  
 [best-javascript-drawing-libraries](https://www.slant.co/topics/28/~best-javascript-drawing-libraries)  
 
+# Deployment on a K8s based MEC
+Deploying the OpenHDMap system on Multi-access Edge Computing (MEC) with Kubernetes (K8s) clusters and 5G connectivity involves several components and steps. Here’s a detailed approach:
+
+### Components and Architecture
+1. **MEC Hosts**: Each MEC host serves a specific geographical region.
+2. **Kubernetes Clusters**: Each MEC host runs a K8s cluster to manage containerized applications.
+3. **5G Connectivity and UPF (User Plane Function)**: Ensures fast and reliable communication between vehicles and MEC hosts.
+4. **HDMap Services**: Consist of different microservices for map collection, production, labeling, and saving.
+5. **Point Cloud Data Exchange**: Mechanism for sharing parts of point clouds between different HDMap instances.
+
+### Deployment Steps
+
+#### 1. Kubernetes Cluster Setup
+- Ensure each MEC host has a Kubernetes cluster installed and properly configured.
+- Set up networking and storage for the K8s clusters.
+- Deploy necessary Kubernetes controllers and services for managing workloads.
+
+#### 2. Service Deployment on Kubernetes
+- **Map Collection Service**: Deploy microservices that handle data collection from vehicles. These services will receive raw sensor data (e.g., lidar, GPS) over 5G.
+- **Map Production Service**: Deploy services that perform point cloud registration and create 3D models from collected data.
+- **Map Labeling Service**: Deploy tools for manual and automated map labeling.
+- **Map Saving Service**: Deploy services that store and manage HD map data, ensuring it’s available in required formats and structured into layers.
+
+#### 3. Point Cloud Data Exchange
+- **Inter-MEC Communication**: Use Kubernetes services and network policies to enable communication between MEC hosts.
+- **Message Brokers/Queues**: Use systems like Kafka or RabbitMQ to handle the exchange of point cloud data between different MEC regions. This ensures reliability and scalability.
+- **Data Consistency**: Implement mechanisms for ensuring data consistency and resolving conflicts when point clouds are exchanged.
+
+#### 4. Edge Node Configuration
+- **Vehicle Connectivity**: Configure vehicles to connect to the nearest MEC host via 5G.
+- **UPF Integration**: Integrate User Plane Functions (UPF) to manage data traffic efficiently between vehicles and MEC hosts.
+
+### Collaborative HDMap Workflow
+
+1. **Map Collection**:
+   - Vehicles collect data using sensors and upload it to the nearest MEC host via 5G.
+   - The collected data is stored temporarily in the K8s cluster.
+
+2. **Map Production**:
+   - The point cloud data is processed to generate 3D street and building models.
+   - Use NDT Mapping or other SLAM methods as required.
+
+3. **Map Labeling**:
+   - Label the processed maps with lane lines, traffic signs, and other relevant features.
+   - Store labeled data in the appropriate map layers.
+
+4. **Map Saving and Exchange**:
+   - Save the HD maps in standardized formats like OpenDrive.
+   - Use Kafka/RabbitMQ to publish point cloud data to other MEC hosts.
+   - Subscribe to point cloud data from adjacent regions to ensure comprehensive coverage.
+
+### Example Kubernetes Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hdmap-collection
+  namespace: hdmap
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hdmap-collection
+  template:
+    metadata:
+      labels:
+        app: hdmap-collection
+    spec:
+      containers:
+      - name: collection
+        image: hdmap/collection:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MEC_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdmap-collection
+  namespace: hdmap
+spec:
+  selector:
+    app: hdmap-collection
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hdmap-production
+  namespace: hdmap
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hdmap-production
+  template:
+    metadata:
+      labels:
+        app: hdmap-production
+    spec:
+      containers:
+      - name: production
+        image: hdmap/production:latest
+        ports:
+        - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdmap-production
+  namespace: hdmap
+spec:
+  selector:
+    app: hdmap-production
+  ports:
+  - protocol: TCP
+    port: 81
+    targetPort: 8081
+```
+
+### Additional Considerations
+
+1. **Security**: Ensure secure communication channels (e.g., TLS) between vehicles and MEC hosts, and between MEC hosts themselves.
+2. **Scalability**: Use Kubernetes Horizontal Pod Autoscaler (HPA) to scale services based on load.
+3. **Monitoring and Logging**: Implement logging and monitoring (e.g., Prometheus, Grafana) for real-time insights and debugging.
+4. **Data Privacy**: Ensure compliance with data privacy regulations, especially when handling location and sensor data from vehicles.
+
+This approach ensures that the OpenHDMap system can efficiently manage HD map production and sharing in a distributed and collaborative manner across multiple MEC hosts using Kubernetes and 5G.
+
