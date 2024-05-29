@@ -1,6 +1,75 @@
 # OpenHDMap
-This is an open source HD map project for autonomous driving. The precision map production process is divided into four parts: **map collection, map production, map labeling, and map saving**. This project mainly uses lidar as a collection sensor to provide the map making process.  
 
+## Key terms and definition 
+To understand the GitHub README for the OpenHDMap project, here's a breakdown of key terms and their definitions:
+
+1. **HD Map (High Definition Map)**: Detailed maps that provide highly precise information about roads, lanes, traffic signs, and other relevant features for autonomous driving.
+
+2. **Lidar**: A sensor that measures distances by illuminating the target with laser light and measuring the reflection with a sensor. Used for creating high-resolution maps.
+
+3. **Point Cloud**: A set of data points in space produced by 3D scanners like lidar. Each point represents a location on a surface within the scanned area.
+
+4. **Point Cloud Registration**: The process of aligning multiple point clouds to create a comprehensive model. Also known as stitching.
+
+5. **NDT Mapping (Normal Distributions Transform Mapping)**: A method for mapping using lidar data that builds a probabilistic representation of the environment to align point clouds.
+
+6. **SLAM (Simultaneous Localization and Mapping)**: A process where a device simultaneously builds a map of its surroundings and keeps track of its location within that map.
+
+7. **Autoware**: An open-source software project that provides a complete system for autonomous driving. It includes modules for perception, planning, and control.
+
+8. **LOAM (Lidar Odometry and Mapping)**: An algorithm used for real-time lidar odometry and mapping.
+
+9. **OpenDrive**: A format for describing road networks to support driving simulation.
+
+10. **Sensor Fusion**: Combining data from multiple sensors to produce more accurate, reliable information.
+
+11. **Map Layers**:
+    - **Base Layer**: Contains structured map information like lane lines and traffic rules.
+    - **Positioning Layer**: Includes original point clouds and features that aid in positioning, such as buildings and traffic signs.
+    - **Dynamic Layer**: Holds information about dynamically changing conditions, such as traffic or accidents.
+
+12. **Apollo HD Map**: A high-definition map format used by the Apollo autonomous driving platform.
+
+13. **Map Collection**: The process of gathering data using a vehicle equipped with sensors like lidar, cameras, GPS, and IMU (Inertial Measurement Unit).
+
+14. **Map Labeling**: Annotating the map with additional information such as lane lines, traffic signs, and lights. This can be done manually or automatically.
+
+15. **Map Saving**: Storing the processed and labeled map data in a specific format and structure.
+
+16. **KITTI**: An open dataset widely used in autonomous driving research containing raw data collected by driving a car around a mid-size city.
+
+17. **Interactive SLAM**: A type of SLAM that involves user interaction to improve mapping accuracy.
+
+18. **Autonomous Driving Simulation**: Using software to simulate driving scenarios for testing and development of autonomous driving technologies.
+
+### Structure of the Project
+- **data**: Directory where datasets are stored.
+- **docs/img**: Directory containing documentation and images.
+- **map_format_tool**: Tools for converting map formats.
+- **map_label_tool**: Tools for labeling maps.
+- **map_production**: Directory for creating high-precision maps.
+
+### Workflow Overview
+1. **Map Collection**: Collecting data using a sensor-equipped vehicle.
+2. **Map Production**: Generating 3D models from point cloud data using techniques like NDT Mapping.
+3. **Map Labeling**: Annotating the 3D map with additional details manually or using sensor fusion.
+4. **Map Saving**: Storing the map in formats like OpenDrive, and structuring it into layers for various uses.
+
+### Tools and References
+- **Autoware NDT Mapping**: Tool used for creating maps from point cloud data.
+- **Map Annotation Tool**: Soon-to-be-released tool for labeling maps.
+- **Apollo and Autoware Integration**: Formats provided for compatibility with these platforms.
+
+### Quick Start Guide
+- **docs**: Documentation.
+- **map_format_tool**: Tools for format conversion.
+- **map_label_tool**: Tools for map labeling.
+- **map_production**: Tools for creating high-precision maps.
+
+This breakdown should help you understand the key concepts and workflow of the OpenHDMap project.
+
+This is an open source HD map project for autonomous driving. The precision map production process is divided into four parts: **map collection, map production, map labeling, and map saving**. This project mainly uses lidar as a collection sensor to provide the map making process.  
+## Overview
 The goal is to provide a complete mapping process for autonomous driving systems and simulation.  
 
 If you have any advice, please feel free to contact us.  
