@@ -1326,3 +1326,141 @@ Here is an example of how to configure RBAC and network policies in a Kubernetes
      ```
 
 By implementing these detailed mitigation strategies, you can significantly reduce the risk of elevation of privilege attacks in the OpenHDMap deployment on MEC with Kubernetes. This ensures that only authorized users and services have access to necessary resources, maintaining the integrity and security of the HD map production process for autonomous vehicle operations.
+Sure, I'll provide a more detailed breakdown of the Kubernetes components and data stores for each node type in the context of the HD map system, using PyTM's Data Flow Diagram (DFD) framework. This will include the control plane components on the master node and the necessary components on worker nodes.
+
+# K8s specific threat model
+
+### Kubernetes Components Overview
+
+#### Master Node (Control Plane)
+1. **etcd**: Key-value store for all cluster data.
+2. **kube-apiserver**: Exposes the Kubernetes API.
+3. **kube-controller-manager**: Runs controller processes.
+4. **kube-scheduler**: Assigns workloads to nodes.
+5. **cloud-controller-manager**: Interacts with the cloud provider (if applicable).
+
+#### Worker Nodes
+1. **kubelet**: Agent that ensures containers are running.
+2. **kube-proxy**: Manages network rules.
+3. **Container Runtime Interface (CRI)**: Manages container lifecycle.
+4. **Container Storage Interface (CSI)**: Manages storage resources.
+5. **Container Network Interface (CNI)**: Manages network resources.
+
+#### Plugins and Tools
+1. **Flannel/Calico**: Examples of CNI plugins.
+2. **Docker/containerd**: Examples of CRI implementations.
+3. **Storage plugins**: Examples of CSI implementations.
+
+### PyTM Data Flow Diagram (DFD)
+
+First, let's initialize the PyTM model with the basic entities for the HD map system, and then add the Kubernetes-specific components.
+
+```python
+from pytm import TM, Server, Dataflow, Boundary, Datastore, Process, Actor, Lambda
+
+tm = TM("OpenHDMap on MEC with Kubernetes")
+
+# Defining Boundaries
+k8s_control_plane_boundary = Boundary("K8s Control Plane")
+worker_nodes_boundary = Boundary("Worker Nodes")
+external_boundary = Boundary("External")
+
+# Defining Actors
+user = Actor("User")
+autonomous_car = Actor("Autonomous Car")
+
+# Defining Processes
+lidar_data_collection = Process("Lidar Data Collection")
+gps_data_collection = Process("GPS Data Collection")
+camera_data_collection = Process("Camera Data Collection")
+imu_data_collection = Process("IMU Data Collection")
+
+# Defining Control Plane Components
+etcd = Datastore("etcd", parent=k8s_control_plane_boundary)
+kube_apiserver = Process("kube-apiserver", parent=k8s_control_plane_boundary)
+kube_controller_manager = Process("kube-controller-manager", parent=k8s_control_plane_boundary)
+kube_scheduler = Process("kube-scheduler", parent=k8s_control_plane_boundary)
+cloud_controller_manager = Process("cloud-controller-manager", parent=k8s_control_plane_boundary)
+
+# Defining Worker Node Components
+kubelet = Process("kubelet", parent=worker_nodes_boundary)
+kube_proxy = Process("kube-proxy", parent=worker_nodes_boundary)
+cri_plugin = Process("CRI Plugin", parent=worker_nodes_boundary)
+csi_plugin = Process("CSI Plugin", parent=worker_nodes_boundary)
+cni_plugin = Process("CNI Plugin", parent=worker_nodes_boundary)
+
+# Defining Dataflows
+Dataflow(user, lidar_data_collection, "User initiates lidar data collection")
+Dataflow(autonomous_car, gps_data_collection, "Autonomous car sends GPS data")
+Dataflow(autonomous_car, camera_data_collection, "Autonomous car sends camera data")
+Dataflow(autonomous_car, imu_data_collection, "Autonomous car sends IMU data")
+
+Dataflow(lidar_data_collection, kubelet, "Lidar data collected")
+Dataflow(gps_data_collection, kubelet, "GPS data collected")
+Dataflow(camera_data_collection, kubelet, "Camera data collected")
+Dataflow(imu_data_collection, kubelet, "IMU data collected")
+
+Dataflow(kubelet, kube_apiserver, "Kubelet sends data to API server")
+Dataflow(kube_apiserver, etcd, "API server writes data to etcd")
+Dataflow(kube_controller_manager, etcd, "Controller manager reads/writes from/to etcd")
+Dataflow(kube_scheduler, kube_apiserver, "Scheduler communicates with API server")
+Dataflow(cloud_controller_manager, kube_apiserver, "Cloud controller manager communicates with API server")
+Dataflow(kube_proxy, cni_plugin, "Kube-proxy interacts with CNI plugin")
+
+Dataflow(cri_plugin, kubelet, "CRI plugin manages container runtime")
+Dataflow(csi_plugin, kubelet, "CSI plugin manages storage resources")
+Dataflow(cni_plugin, kubelet, "CNI plugin manages network resources")
+
+# Create threat model diagram
+tm.process()
+to.threats()
+```
+
+### Explanation
+
+1. **Boundaries**: We have three main boundaries: `K8s Control Plane`, `Worker Nodes`, and `External`.
+2. **Actors**: `User` and `Autonomous Car` interact with the system.
+3. **Processes**: Data collection processes for Lidar, GPS, Camera, and IMU data.
+4. **Control Plane Components**: Core Kubernetes control plane components within the `K8s Control Plane` boundary.
+5. **Worker Node Components**: Essential components on worker nodes within the `Worker Nodes` boundary.
+6. **Dataflows**: Detailed dataflows showing interactions between different components, including how data is collected and processed within the Kubernetes ecosystem.
+
+### Detailed Threat Mitigation Strategies
+
+#### Master Node (Control Plane) Components
+
+1. **etcd**
+   - **Mitigation**: Use encryption both at rest and in transit; enforce strong access controls and regular audits.
+
+2. **kube-apiserver**
+   - **Mitigation**: Use RBAC for access control, enable audit logs, restrict API server access using network policies.
+
+3. **kube-controller-manager**
+   - **Mitigation**: Ensure it runs as a non-root user, use secure communication protocols, and restrict access to critical operations.
+
+4. **kube-scheduler**
+   - **Mitigation**: Secure communication with API server, use least privilege principle for scheduling permissions.
+
+5. **cloud-controller-manager**
+   - **Mitigation**: Secure API interactions with cloud providers, use minimal necessary permissions for cloud operations.
+
+#### Worker Node Components
+
+1. **kubelet**
+   - **Mitigation**: Restrict access to kubelet API, use TLS for kubelet communication, run kubelet as a non-root user.
+
+2. **kube-proxy**
+   - **Mitigation**: Use network policies to restrict access, ensure kube-proxy is up-to-date to mitigate known vulnerabilities.
+
+3. **CRI Plugin**
+   - **Mitigation**: Regularly update CRI plugins, run plugins with the least privilege necessary.
+
+4. **CSI Plugin**
+   - **Mitigation**: Ensure secure storage management, use encrypted storage solutions, and enforce strong access controls.
+
+5. **CNI Plugin**
+   - **Mitigation**: Secure network communication, use up-to-date CNI plugins, and enforce strict network policies.
+
+### Conclusion
+
+This detailed PyTM DFD, combined with a comprehensive analysis of Kubernetes components, provides a thorough understanding of the deployment architecture for the HD map system on MEC with Kubernetes. Implementing the specified mitigation strategies will help secure the system against various threats, ensuring robust and secure operations for autonomous vehicle navigation.
