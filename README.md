@@ -1464,3 +1464,72 @@ to.threats()
 ### Conclusion
 
 This detailed PyTM DFD, combined with a comprehensive analysis of Kubernetes components, provides a thorough understanding of the deployment architecture for the HD map system on MEC with Kubernetes. Implementing the specified mitigation strategies will help secure the system against various threats, ensuring robust and secure operations for autonomous vehicle navigation.
+
+# Extended threat model for K8s and K8s-HDMap dataflows
+Below is a detailed list of STRIDE threats for Kubernetes (K8s) and its interaction with the HDMap processes:
+
+### STRIDE Threats for Kubernetes Components
+
+1. **Spoofing**
+   - **Threat**: An attacker impersonates a legitimate Kubernetes user or component to gain unauthorized access.
+   - **Example**: An attacker spoofs the identity of a Kubernetes administrator to gain access to the control plane.
+   - **Mitigation**: Implement strong authentication mechanisms such as mutual TLS, and enforce multi-factor authentication (MFA) for critical operations.
+
+2. **Tampering**
+   - **Threat**: An attacker modifies Kubernetes resources or configuration to disrupt system operations or gain unauthorized privileges.
+   - **Example**: Modifying a pod's security context to allow escalated privileges.
+   - **Mitigation**: Enable Kubernetes resource integrity protection features such as admission controllers and PodSecurityPolicies (PSPs), and implement continuous monitoring for unauthorized changes.
+
+3. **Repudiation**
+   - **Threat**: A user or component denies performing actions within Kubernetes, leading to accountability issues.
+   - **Example**: A user claims they did not delete a critical resource, leading to confusion during incident response.
+   - **Mitigation**: Enable audit logging for all Kubernetes API interactions and enforce strict access controls to prevent unauthorized actions.
+
+4. **Information Disclosure**
+   - **Threat**: Unauthorized access or exposure of sensitive information stored or transmitted within Kubernetes.
+   - **Example**: Exposure of secret keys or sensitive pod metadata.
+   - **Mitigation**: Encrypt sensitive data at rest and in transit, implement network segmentation, and restrict access to sensitive resources using RBAC.
+
+5. **Denial of Service (DoS)**
+   - **Threat**: An attacker disrupts Kubernetes services or resources, causing a loss of availability.
+   - **Example**: Launching a brute-force attack against the Kubernetes API server to overwhelm it.
+   - **Mitigation**: Implement rate limiting, resource quotas, and network policies to mitigate DoS attacks. Ensure Kubernetes components are highly available and properly scaled.
+
+6. **Elevation of Privilege (EoP)**
+   - **Threat**: An attacker gains higher privileges within Kubernetes than originally authorized.
+   - **Example**: Exploiting a vulnerability in a container runtime to gain root access on a worker node.
+   - **Mitigation**: Follow the principle of least privilege, regularly update Kubernetes components and dependencies, and enforce strict access controls and resource isolation.
+
+### Interaction with HDMap Processes
+
+1. **Spoofing**
+   - **Threat**: An attacker spoofs the identity of an HDMap process to gain unauthorized access to Kubernetes resources.
+   - **Example**: Spoofing the identity of an HDMap data collection process to gain access to sensitive Kubernetes secrets.
+   - **Mitigation**: Implement strong authentication and authorization mechanisms for interactions between HDMap processes and Kubernetes components.
+
+2. **Tampering**
+   - **Threat**: An attacker tampers with HDMap processes or data stored in Kubernetes to manipulate maps or compromise system integrity.
+   - **Example**: Modifying Lidar data stored in Kubernetes to introduce fake obstacles or alter map features.
+   - **Mitigation**: Implement integrity checks for HDMap processes and data, enforce access controls, and use encryption to protect sensitive data at rest.
+
+3. **Repudiation**
+   - **Threat**: A compromised HDMap process denies performing certain actions within Kubernetes, making it difficult to trace unauthorized activities.
+   - **Example**: A compromised HDMap labeling tool denies modifying map data, leading to accountability issues during incident response.
+   - **Mitigation**: Enable comprehensive audit logging for HDMap processes interacting with Kubernetes, and enforce accountability through strict access controls and identity management.
+
+4. **Information Disclosure**
+   - **Threat**: Sensitive information related to HDMap processes or data stored in Kubernetes is exposed to unauthorized users.
+   - **Example**: Exposure of HDMap configuration details or map labels to unauthorized parties.
+   - **Mitigation**: Implement encryption for sensitive data, enforce strict access controls and network segmentation, and regularly audit access to HDMap-related resources.
+
+5. **Denial of Service (DoS)**
+   - **Threat**: An attacker launches a DoS attack targeting HDMap processes or Kubernetes resources, leading to service disruption.
+   - **Example**: Overloading the Kubernetes API server to disrupt HDMap data collection or processing.
+   - **Mitigation**: Implement rate limiting, resource quotas, and network policies to mitigate DoS attacks. Ensure scalability and redundancy for HDMap processes and Kubernetes components.
+
+6. **Elevation of Privilege (EoP)**
+   - **Threat**: An attacker gains elevated privileges within Kubernetes through compromised HDMap processes or data.
+   - **Example**: Exploiting a vulnerability in an HDMap container to gain root access on a Kubernetes node.
+   - **Mitigation**: Follow security best practices for both Kubernetes and HDMap, including regular updates, least privilege access, and strict isolation of sensitive components and data.
+
+By addressing these STRIDE threats and implementing the recommended mitigation strategies, the overall security posture of the HDMap deployment on Kubernetes can be significantly enhanced, ensuring the integrity, confidentiality, and availability of critical resources and processes.
