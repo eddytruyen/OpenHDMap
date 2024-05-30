@@ -1533,3 +1533,194 @@ Below is a detailed list of STRIDE threats for Kubernetes (K8s) and its interact
    - **Mitigation**: Follow security best practices for both Kubernetes and HDMap, including regular updates, least privilege access, and strict isolation of sensitive components and data.
 
 By addressing these STRIDE threats and implementing the recommended mitigation strategies, the overall security posture of the HDMap deployment on Kubernetes can be significantly enhanced, ensuring the integrity, confidentiality, and availability of critical resources and processes.
+
+# Severity and Likelihood of Threats
+To assess the severity and likelihood of each threat identified in this conversation, we can categorize them using a qualitative scale:
+- **Severity**: Low, Medium, High, Critical
+- **Likelihood**: Unlikely, Possible, Likely, Very Likely
+
+### Explanation
+
+- **Severity**: This is determined based on the potential impact of the threat. Critical threats can lead to a complete system compromise or service disruption. High threats can cause significant issues but may not lead to complete system failure. Medium threats are less severe but still pose a risk. Low threats have minimal impact.
+  
+- **Likelihood**: This is based on the estimated probability of the threat occurring. Very likely means it is almost certain to occur. Likely means there is a strong chance. Possible means it can happen but is not guaranteed. Unlikely means it is improbable but not impossible.
+
+This assessment helps prioritize the implementation of mitigation strategies, focusing first on threats that are both likely and have high or critical severity.
+## Analysis for HDMap deployed on K8s-based MEC
+
+### Spoofing Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Spoofing the identity of a Kubernetes user or component                  | High     | Possible   |
+| Spoofing the identity of an HDMap process                                | High     | Possible   |
+| Spoofing 5G network components to interact with Kubernetes               | High     | Possible   |
+| Spoofing UPF (User Plane Function) to manipulate data traffic            | High     | Possible   |
+| Spoofing inter-region MEC communication to intercept HDMap data exchange | High     | Possible   |
+
+### Tampering Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Tampering with Kubernetes resources or configuration                     | High     | Possible   |
+| Tampering with HDMap processes or data                                   | High     | Possible   |
+| Tampering with collected Lidar, camera, GPS, and IMU data                | High     | Possible   |
+| Tampering with inter-region data exchange between MEC hosts              | High     | Possible   |
+| Tampering with Kubernetes secrets or sensitive data                      | High     | Possible   |
+
+### Repudiation Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Denial of actions within Kubernetes                                      | Medium   | Possible   |
+| Denial of actions within HDMap processes                                 | Medium   | Possible   |
+| Denial of unauthorized data exchange in inter-region communication       | Medium   | Possible   |
+| Denial of unauthorized access attempts to Kubernetes API                 | Medium   | Possible   |
+| Denial of modifications to Lidar and other sensor data                   | Medium   | Possible   |
+
+### Information Disclosure Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Exposure of sensitive Kubernetes information                             | High     | Possible   |
+| Exposure of HDMap-related sensitive information                          | High     | Possible   |
+| Exposure of Lidar, camera, GPS, and IMU data                             | High     | Possible   |
+| Exposure of Kubernetes secrets                                           | High     | Possible   |
+| Exposure of inter-region data exchange details                           | High     | Possible   |
+
+### Denial of Service (DoS) Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Disruption of Kubernetes services                                        | Critical | Possible   |
+| Disruption of HDMap processes                                            | Critical | Possible   |
+| Overloading the Kubernetes API server                                    | Critical | Possible   |
+| Overloading MEC hosts to disrupt inter-region communication              | Critical | Possible   |
+| Disruption of data collection from Lidar and other sensors               | Critical | Possible   |
+
+### Elevation of Privilege (EoP) Threats
+
+| Threat                                                                   | Severity | Likelihood |
+|--------------------------------------------------------------------------|----------|------------|
+| Gaining higher privileges within Kubernetes                              | Critical | Possible   |
+| Gaining elevated privileges through HDMap processes                      | Critical | Possible   |
+| Gaining elevated privileges on MEC hosts                                 | Critical | Possible   |
+| Exploiting vulnerabilities in 5G network components                      | Critical | Possible   |
+| Exploiting Kubernetes vulnerabilities to gain cluster-wide access        | Critical | Possible   |
+
+### Summary Table
+
+| Category               | Threat                                                                   | Severity | Likelihood |
+|------------------------|--------------------------------------------------------------------------|----------|------------|
+| **Spoofing**           | Spoofing the identity of a Kubernetes user or component                  | High     | Possible   |
+|                        | Spoofing the identity of an HDMap process                                | High     | Possible   |
+|                        | Spoofing 5G network components to interact with Kubernetes               | High     | Possible   |
+|                        | Spoofing UPF to manipulate data traffic                                  | High     | Possible   |
+|                        | Spoofing inter-region MEC communication to intercept HDMap data exchange | High     | Possible   |
+| **Tampering**          | Tampering with Kubernetes resources or configuration                     | High     | Possible   |
+|                        | Tampering with HDMap processes or data                                   | High     | Possible   |
+|                        | Tampering with collected Lidar, camera, GPS, and IMU data                | High     | Possible   |
+|                        | Tampering with inter-region data exchange between MEC hosts              | High     | Possible   |
+|                        | Tampering with Kubernetes secrets or sensitive data                      | High     | Possible   |
+| **Repudiation**        | Denial of actions within Kubernetes                                      | Medium   | Possible   |
+|                        | Denial of actions within HDMap processes                                 | Medium   | Possible   |
+|                        | Denial of unauthorized data exchange in inter-region communication       | Medium   | Possible   |
+|                        | Denial of unauthorized access attempts to Kubernetes API                 | Medium   | Possible   |
+|                        | Denial of modifications to Lidar and other sensor data                   | Medium   | Possible   |
+| **Information Disclosure** | Exposure of sensitive Kubernetes information                             | High     | Possible   |
+|                        | Exposure of HDMap-related sensitive information                          | High     | Possible   |
+|                        | Exposure of Lidar, camera, GPS, and IMU data                             | High     | Possible   |
+|                        | Exposure of Kubernetes secrets                                           | High     | Possible   |
+|                        | Exposure of inter-region data exchange details                           | High     | Possible   |
+| **Denial of Service (DoS)** | Disruption of Kubernetes services                                        | Critical | Possible   |
+|                        | Disruption of HDMap processes                                            | Critical | Possible   |
+|                        | Overloading the Kubernetes API server                                    | Critical | Possible   |
+|                        | Overloading MEC hosts to disrupt inter-region communication              | Critical | Possible   |
+|                        | Disruption of data collection from Lidar and other sensors               | Critical | Possible   |
+| **Elevation of Privilege (EoP)** | Gaining higher privileges within Kubernetes                              | Critical | Possible   |
+|                        | Gaining elevated privileges through HDMap processes                      | Critical | Possible   |
+|                        | Gaining elevated privileges on MEC hosts                                 | Critical | Possible   |
+|                        | Exploiting vulnerabilities in 5G network components                      | Critical | Possible   |
+|                        | Exploiting Kubernetes vulnerabilities to gain cluster-wide access        | Critical | Possible   |
+
+This detailed assessment helps prioritize security measures and mitigation strategies for the HDMap deployment on Kubernetes in an MEC environment. By focusing on high-severity and likely threats, the system's security can be significantly enhanced.
+
+## Analysis of K8s itself and  interactions with these components from HDMap
+
+### Spoofing Threats
+
+1. **Spoofing the identity of a Kubernetes user or component**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+2. **Spoofing the identity of an HDMap process**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+### Tampering Threats
+
+1. **Tampering with Kubernetes resources or configuration**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+2. **Tampering with HDMap processes or data**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+### Repudiation Threats
+
+1. **Denial of actions within Kubernetes**
+   - **Severity**: Medium
+   - **Likelihood**: Possible
+
+2. **Denial of actions within HDMap processes**
+   - **Severity**: Medium
+   - **Likelihood**: Possible
+
+### Information Disclosure Threats
+
+1. **Exposure of sensitive Kubernetes information**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+2. **Exposure of HDMap-related sensitive information**
+   - **Severity**: High
+   - **Likelihood**: Possible
+
+### Denial of Service (DoS) Threats
+
+1. **Disruption of Kubernetes services**
+   - **Severity**: Critical
+   - **Likelihood**: Possible
+
+2. **Disruption of HDMap processes**
+   - **Severity**: Critical
+   - **Likelihood**: Possible
+
+### Elevation of Privilege (EoP) Threats
+
+1. **Gaining higher privileges within Kubernetes**
+   - **Severity**: Critical
+   - **Likelihood**: Possible
+
+2. **Gaining elevated privileges through HDMap processes**
+   - **Severity**: Critical
+   - **Likelihood**: Possible
+
+### Summary Table
+
+| Threat                                        | Severity | Likelihood  |
+|-----------------------------------------------|----------|-------------|
+| Spoofing the identity of a Kubernetes user    | High     | Possible    |
+| Spoofing the identity of an HDMap process     | High     | Possible    |
+| Tampering with Kubernetes resources           | High     | Possible    |
+| Tampering with HDMap processes or data        | High     | Possible    |
+| Denial of actions within Kubernetes           | Medium   | Possible    |
+| Denial of actions within HDMap processes      | Medium   | Possible    |
+| Exposure of sensitive Kubernetes information  | High     | Possible    |
+| Exposure of HDMap-related sensitive information| High    | Possible    |
+| Disruption of Kubernetes services             | Critical | Possible    |
+| Disruption of HDMap processes                 | Critical | Possible    |
+| Gaining higher privileges within Kubernetes   | Critical | Possible    |
+| Gaining elevated privileges through HDMap     | Critical | Possible    |
+
