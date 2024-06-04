@@ -324,7 +324,9 @@ PyTM is a threat modeling tool that helps security professionals and developers 
 Below is an example PyTM script for the described OpenHDMap deployment on MEC with Kubernetes, including generating the DFD and identifying STRIDE threats.
 
 ```python
-from pytm import TM, Server, Process, Dataflow, Boundary, Data, Actor, Store
+#!/usr/bin/env python3
+
+from pytm import TM, Server, Process, Dataflow, Boundary, Data, Actor, Datastore as Store
 
 # Define the Threat Model
 tm = TM("OpenHDMap Deployment on MEC")
@@ -354,15 +356,15 @@ map_saving_service = Process("Map Saving Service")
 point_cloud_data = Data("Point Cloud Data")
 hd_map = Store("HD Map")
 
-inter_mec_comm = Dataflow("Inter-MEC Communication", mec_host, mec_host, data="Point Cloud Data")
+inter_mec_comm = Dataflow(mec_host, mec_host, "Inter-MEC Communication", data="Point Cloud Data")
 
 # Define data flows
-df1 = Dataflow("Sensor Data to MEC", car, vehicle_sensors, data=[lidar_data, gps_data, camera_data, imu_data])
-df2 = Dataflow("Sensor Data to Collection Service", vehicle_sensors, data_collection_service)
-df3 = Dataflow("Collected Data to Production Service", data_collection_service, map_production_service, data=point_cloud_data)
-df4 = Dataflow("Processed Data to Labeling Service", map_production_service, map_labeling_service)
-df5 = Dataflow("Labeled Data to Saving Service", map_labeling_service, map_saving_service)
-df6 = Dataflow("HD Map Storage", map_saving_service, hd_map)
+df1 = Dataflow(car, vehicle_sensors, "Sensor Data to MEC", data=[lidar_data, gps_data, camera_data, imu_data])
+df2 = Dataflow(vehicle_sensors, data_collection_service, "Sensor Data to Collection Service")
+df3 = Dataflow(data_collection_service, map_production_service, "Collected Data to Production Service", data=point_cloud_data)
+df4 = Dataflow(map_production_service, map_labeling_service, "Processed Data to Labeling Service")
+df5 = Dataflow(map_labeling_service, map_saving_service,"Labeled Data to Saving Service")
+df6 = Dataflow(map_saving_service, hd_map,"HD Map Storage")
 
 # Define trust boundaries
 df1.boundary = VehicleNetwork
@@ -376,11 +378,11 @@ inter_mec_comm.boundary = Internet
 # Set threat model properties
 tm.process()
 
-# Print the DFD diagram
-tm.dataflows()
 
 # Generate STRIDE threats
-tm.threats()
+#for i in tm._threats:
+#    i.print()
+
 ```
 
 ### Explanation of Elements
